@@ -6,7 +6,7 @@ pipeline {
     }
 
     environment {
-        DOCKER_HUB_USER = 'seynabou02'
+        DOCKER_HUB_USER = 'sall889'
         FRONT_IMAGE = 'react-frontend'
         BACKEND_IMAGE = 'express-backend'
     }
@@ -29,7 +29,7 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/Seynabou26/full_stack_app.git'
+                git branch: 'main', url: 'https://github.com/MHD-sall/kubernetes.git'
             }
         }
 
@@ -112,7 +112,7 @@ pipeline {
         
         stage('Push Docker Images') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'DOCKER_CREDENTIALS', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                     sh '''
                         echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
                         docker push $DOCKER_USER/$FRONT_IMAGE:latest
@@ -151,7 +151,7 @@ pipeline {
 
         stage('Deploy to Kubernetes') {
             steps {
-                withKubeConfig([credentialsId: 'kubeconfig-jenkins']) {
+                withKubeConfig([credentialsId: 'kubernetes']) {
                     // Déployer MongoDB
                     sh "kubectl apply -f k8s/mongo-deployment.yaml"
                     sh "kubectl apply -f k8s/mongo-service.yaml"
@@ -207,14 +207,14 @@ pipeline {
             emailext(
                 subject: "Build SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                 body: "Pipeline réussi\nDétails : ${env.BUILD_URL}",
-                to: "seynaboubadji26@gmail.com"
+                to: "methzosll889@gmail.com"
             )
         }
         failure {
             emailext(
                 subject: "Build FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                 body: "Le pipeline a échoué\nDétails : ${env.BUILD_URL}",
-                to: "seynaboubadji26@gmail.com"
+                to: "methzosll889@gmail.com"
             )
         }
     }
